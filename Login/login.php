@@ -4,7 +4,7 @@ session_start();
 // Daftar pengguna admin
 $admin_users = [
     'rafi' => 'rawr',
-    'ebin' => 'rawr',
+    'ebin' => 'rexx123',
 ];
 
 // Ambil data dari form login
@@ -15,13 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($admin_users[$username]) && $admin_users[$username] === $password) {
         // Simpan username dan role admin ke session
         $_SESSION['user'] = $username;
-        $_SESSION['role'] = 'admin';
+        $_SESSION['role'] = 'Admin';
         header('Location: ../index.php');
         exit;
     } elseif (!empty($username) && !empty($password)) {
         // Simpan username dan role pelanggan ke session
         $_SESSION['user'] = $username;
-        $_SESSION['role'] = 'pelanggan';
+        $_SESSION['role'] = 'Pelanggan';
         header('Location: ../menu.php');
         exit;
     } else {
