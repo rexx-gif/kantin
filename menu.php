@@ -37,8 +37,8 @@ $num_rows_minuman = $result_minuman->num_rows;
         <li class="dropdown">
             <a href="" class="dropbtn">Menu <i class="fa-solid fa-caret-down"></i></a>
             <div class="dropdown-content">
-            <a href="menu.php#makanan">Makanan</a>
-            <a href="menu.php#minuman">Minuman</a>
+            <a href="menu.php#makanan">Makanan <i class="fa-solid fa-burger"></i></a>
+            <a href="menu.php#minuman">Minuman <i class="fa-solid fa-wine-glass"></i></a>
             </div>  
         </li>
         <li class="dropdown">
@@ -48,9 +48,9 @@ $num_rows_minuman = $result_minuman->num_rows;
             <a href="CUD/tambah_minuman.php">Minuman +</a>
             </div>  
         </li>
-        <li><a href="#">Contact</a></li>
-    </ul>
+     </ul>
     <div class="menu-icon">
+    <a href=""> Login <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
     </div>
 </nav>
 
@@ -111,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
         link.addEventListener("click", (event) => {
             const href = link.getAttribute("href");
 
-            // Cek apakah link ada di dalam dropdown
             const isDropdownLink = link.closest(".dropdown-content");
 
             if (href && !href.startsWith("#") && !href.startsWith("javascript") && !isDropdownLink) {

@@ -63,11 +63,11 @@ if (isset($_POST['submit'])) {
     <form action="" method="post">
         <h1>Tambah Minuman</h1>
         <label for="minuman">Nama Minuman :</label>
-        <input type="text" id="minuman" name="nama_minuman" required>
+        <input type="text" id="minuman" name="nama_minuman" placeholder="Masukkan nama minuman" required>
         <label for="deskripsi">Deskripsi Minuman : </label>
-        <input type="text" name="deskripsi" id="deskripsi" required>
+        <input type="text" name="deskripsi" id="deskripsi" placeholder="Masukan deskripsi minuman" required>
         <label for="harga">Harga Minuman : </label>
-        <input type="number" id="harga" name="harga" required>
+        <input type="number" id="harga" name="harga" placeholder="Masukkan harga minuman" required>
         <button type="submit" name="submit">Tambah</button>
     </form>
     <script>
