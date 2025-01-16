@@ -1,85 +1,84 @@
 <?php
 session_start();
-include('include/config.php');
-include('include/OOPmakanan.php');
-include('include/OOPminuman.php');
+include ('include/config.php'); 
 
-$makanan = new Makanan();
-$datamakanan = $makanan->getMakanan();
-
-$minuman = new Minuman();
-$dataminuman = $minuman->getMinuman();
-
-$query_makanan = "SELECT * FROM makanan";
-$result_makanan = $conn->query($query_makanan); 
-$num_rows_makanan = $result_makanan->num_rows;
-
-$query_minuman = "SELECT * FROM minuman";
-$result_minuman = $conn->query($query_minuman);
-$num_rows_minuman = $result_minuman->num_rows;
-
-if (isset($_GET['id_makanan'])) {
-    // Pemesanan makanan
-    $makanan_id = $_GET['id_makanan'];
-    $quantity = $_POST['quantity'];
+// Cek apakah nama_makanan atau nama_minuman ada di URL
+if (isset($_GET['nama_makanan'])) {
+    $nama_makanan = $_GET['nama_makanan']; // Mengambil nama makanan dari URL
     
-    // Ambil informasi makanan dari database
-    $query = "SELECT * FROM makanan WHERE id = ?";
+    // Ambil data makanan dari database berdasarkan nama
+    $query = "SELECT * FROM makanan WHERE nama_makanan = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $makanan_id);
+    $stmt->bind_param("s", $nama_makanan); // Menggunakan 's' untuk string
     $stmt->execute();
     $result = $stmt->get_result();
-    $makanan = $result->fetch_assoc();
-
-    if ($makanan) {
-        // Hitung total harga
-        $total_harga = $makanan['harga'] * $quantity;
-        
-        // Simpan pemesanan ke database
-        $user_id = $_SESSION['user_id']; // Ambil user_id dari session
-        
-        $query_pemesanan = "INSERT INTO pemesanan (user, makanan_id, quantity, total_harga, status) 
-                            VALUES (?, ?, ?, ?, 'pending')";
-        $stmt_pemesanan = $conn->prepare($query_pemesanan);
-        $stmt_pemesanan->bind_param("iiid", $user_id, $makanan_id, $quantity, $total_harga);
-        if ($stmt_pemesanan->execute()) {
-            echo "Pemesanan berhasil!";
-        } else {
-            echo "Pemesanan gagal!";
-        }
+    
+    // Pastikan makanan ditemukan
+    if ($result && $result->num_rows > 0) {
+        $item = $result->fetch_assoc();  // Menyimpan data makanan ke $item
+    } else {
+        $item = null; // Jika tidak ditemukan
     }
-} elseif (isset($_GET['id_minuman'])) {
-    // Pemesanan minuman (mirip dengan pemesanan makanan)
-    $minuman_id = $_GET['id_minuman'];
-    $quantity = $_POST['quantity'];
+
+} elseif (isset($_GET['nama_minuman'])) {
+    $nama_minuman = $_GET['nama_minuman']; // Mengambil nama minuman dari URL
     
-    // Ambil informasi minuman dari database
-    $query = "SELECT * FROM minuman WHERE id = ?";
+    // Ambil data minuman dari database berdasarkan nama
+    $query = "SELECT * FROM minuman WHERE nama_minuman = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $minuman_id);
+    $stmt->bind_param("s", $nama_minuman); // Menggunakan 's' untuk string
     $stmt->execute();
     $result = $stmt->get_result();
-    $minuman = $result->fetch_assoc();
+    
+    // Pastikan minuman ditemukan
+    if ($result && $result->num_rows > 0) {
+        $item = $result->fetch_assoc();  // Menyimpan data minuman ke $item
+    } else {
+        $item = null; // Jika tidak ditemukan
+    }
+}
 
-    if ($minuman) {
-        // Hitung total harga
-        $total_harga = $minuman['harga'] * $quantity;
+// Mengecek apakah $item sudah didefinisikan
+if (isset($item)) {
+    $nama_item = htmlspecialchars($item['nama_makanan'] ?? $item['nama_minuman']);  // Menampilkan nama item
+    $harga_item = number_format($item['harga'], 0, ',', '.');  // Menampilkan harga item
+} else {
+    $nama_item = "Item tidak ditemukan";
+    $harga_item = "N/A";
+}
+
+// Proses ketika formulir konfirmasi dikirimkan
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['quantity']) && $_POST['quantity'] > 0) {
+        $quantity = $_POST['quantity'];
+        $total_harga = $item['harga'] * $quantity;
         
         // Simpan pemesanan ke database
-        $user_id = $_SESSION['user_id']; // Ambil user_id dari session
-        
-        $query_pemesanan = "INSERT INTO pemesanan (user_id, minuman_id, quantity, total_harga, status) 
-                            VALUES (?, ?, ?, ?, 'pending')";
-        $stmt_pemesanan = $conn->prepare($query_pemesanan);
-        $stmt_pemesanan->bind_param("iiid", $user_id, $minuman_id, $quantity, $total_harga);
+        if (isset($_GET['nama_makanan'])) {
+            // Insert data makanan, termasuk nama_makanan
+            $query_pemesanan = "INSERT INTO pemesanan (makanan_id, nama_makanan, quantity, total_harga, status) 
+                                VALUES (?, ?, ?, ?, 'pending')";
+            $stmt_pemesanan = $conn->prepare($query_pemesanan);
+            $stmt_pemesanan->bind_param("isid", $item['id'], $item['nama_makanan'], $quantity, $total_harga);
+        } elseif (isset($_GET['nama_minuman'])) {
+            // Insert data minuman, termasuk nama_minuman
+            $query_pemesanan = "INSERT INTO pemesanan (minuman_id, nama_minuman, quantity, total_harga, status) 
+                                VALUES (?, ?, ?, ?, 'pending')";
+            $stmt_pemesanan = $conn->prepare($query_pemesanan);
+            $stmt_pemesanan->bind_param("isid", $item['id'], $item['nama_minuman'], $quantity, $total_harga);
+        }
+
+        // Eksekusi query dan cek apakah berhasil
         if ($stmt_pemesanan->execute()) {
-            echo "Pemesanan berhasil!";
+            echo "Pemesanan berhasil!<br>";
+            // Redirect atau tampilkan pesan sukses
+            header('Location: menu.php');
+            exit;
         } else {
-            echo "Pemesanan gagal!";
+            echo "Pemesanan gagal! Error: " . $stmt_pemesanan->error;
         }
     }
 }
-$username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
 ?>
 
 <!DOCTYPE html>
@@ -87,81 +86,16 @@ $username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu X-Kantin</title>
-    <link rel="stylesheet" href="style/menu.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" href="image/Logo.png" type="image/x-icon">
+    <title>Order Confirmation</title>
 </head>
 <body>
-<nav class="navbar">
-    <div class="logo"><img src="image/Logo.png" alt=""></div>
-    <ul class="nav-links">
-        <li><a href="index.php">Home</a></li>
-        <li class="dropdown">
-            <a href="" class="dropbtn">Menu <i class="fa-solid fa-caret-down"></i></a>
-            <div class="dropdown-content">
-            <a href="menu.php#makanan">Makanan <i class="fa-solid fa-burger"></i></a>
-            <a href="menu.php#makanan">Makanan <i class="fa-solid fa-burger"></i></a>
-            </div>  
-        </li>
-     </ul>
-    <div class="menu-icon">
-    <a href="Login/login.php"> <?php echo htmlspecialchars($username); ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
-    </div>
-</nav>
-
-<section id="list">
-    <h1 class="section-title">Makanan <i class="fa-solid fa-burger"></i></h1>
-    <div class="list-container" id="makanan">
-        <?php
-        while ($row_makanan = $result_makanan->fetch_assoc()) {
-            // Assuming 'role' is stored in session
-            $is_admin = $_SESSION['role'] == 'admin'; // Check if the user is admin
-        ?>
-            <div class="list-card">
-                <h2 class="nama_makanan"><?php echo $row_makanan['nama_makanan']; ?></h2>
-                <p class="description"><?php echo $row_makanan['deskripsi']; ?></p>
-                <p class="price">Rp <?= number_format($row_makanan['harga'], 0, ',', '.'); ?></p>
-                <div class="list-actions">
-                    <?php if ($is_admin) { ?>
-                        <!-- Admin can delete, update and buy -->
-                        <a href="CUD/delete_makanan.php?id=<?php echo $row_makanan['id']; ?>" class="delete-btn">Delete</a>
-                        <a href="CUD/update_makanan.php?id=<?php echo $row_makanan['id']; ?>" class="update-btn">Update</a>
-                        <a href="CUD/tambah_makanan.php" class="add-btn">Add Menu</a>
-                    <?php } ?>
-                    <!-- Both Admin and Pelanggan can buy -->
-                    <a href="order.php?nama_makanan=<?php echo $row_makanan['nama_makanan']; ?>" class="buy-btn">Buy Now</a>
-                </div>
-            </div>
-        <?php } ?>
-    </div>
-
-    <h1 class="section-title">Minuman <i class="fa-solid fa-wine-glass"></i></h1>
-    <div class="list-container" id="minuman">
-        <?php
-        while ($row_minuman = $result_minuman->fetch_assoc()) {
-            // Same logic to check for admin role
-            $is_admin = $_SESSION['role'] == 'admin';
-        ?>
-            <div class="list-card">
-                <h2><?php echo $row_minuman['nama_minuman']; ?></h2>
-                <p class="description"><?php echo $row_minuman['deskripsi']; ?></p>
-                <p class="price">Rp <?= number_format($row_minuman['harga'], 0, ',', '.'); ?></p>
-                <div class="list-actions">
-                    <?php if ($is_admin) { ?>
-                        <!-- Admin can delete, update and buy -->
-                        <a href="CUD/delete_minuman.php?id=<?php echo $row_minuman['id']; ?>" class="delete-btn">Delete</a>
-                        <a href="CUD/update_minuman.php?id=<?php echo $row_minuman['id']; ?>" class="update-btn">Update</a>
-                        <a href="CUD/tambah_minuman.php" class="add-btn">Add Menu</a>
-                    <?php } ?>
-                    <!-- Both Admin and Pelanggan can buy -->
-                    <a href="order.php?nama_minuman=<?php echo $row_minuman['nama_minuman']; ?>" class="buy-btn">Buy Now</a>
-                </div>
-            </div>
-        <?php } ?>
-    </div>
-</section>
-<?php $conn->close(); ?>
+    <h1>Konfirmasi Pemesanan</h1>
+    <p>Item: <?php echo $nama_item; ?></p>
+    <p>Harga: Rp <?php echo $harga_item; ?></p>
+    <form method="POST">
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" id="quantity" min="1" value="1" required>
+        <button type="submit">Konfirmasi</button>
+    </form>
 </body>
 </html>
