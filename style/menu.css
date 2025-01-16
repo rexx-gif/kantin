@@ -168,9 +168,18 @@ body {
     }
 }
 
-.list-container:hover .list-card:not(:hover) {
+.list-container:hover .list-card:not(:hover)  {
     filter: blur(5px);
     opacity: 0.6;
+}
+
+.nama_makanan {
+    transition: transform 1s ease, opacity 0.5s ease;
+}
+
+.nama_makanan:hover {
+    transform: translate(-100%);
+    opacity: 1;
 }
 
 .description {
@@ -217,4 +226,12 @@ body {
 
 .update-btn:hover {
     background-color: #8242cc;
+}
+
+.buy-btn {
+    background-color: rgb(120, 63, 199);
+}
+
+.buy-btn:hover {
+    background-color: rgb(65, 23, 124);
 }

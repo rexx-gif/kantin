@@ -1,9 +1,14 @@
+<?php
+session_start();
+$username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kantin</title>
+    <title>X-Kantin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="image/Logo.png" type="image/x-icon">
@@ -25,13 +30,13 @@
             </li>
         </ul>
         <div class="menu-icon">
-            <a href=""> Login <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
+            <a href="Login/login.php"> <?php echo $username; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
         </div>
     </nav>
     <div class="background-container">
         <img src="image/background.png" alt="Background Image" class="background-image">
         <div class="text-container">
-            <h1>Welcome to Kantin</h1>
+            <h1>Welcome <?php echo $username; ?> to X-Kantin</h1>
             <p>
                 Kami menyajikan berbagai pilihan makanan dan minuman segar dengan harga terjangkau. 
                 Nikmati suasana nyaman dan menu yang bervariasi, cocok untuk makan bersama teman 
@@ -79,6 +84,5 @@
             });
         });
     </script>
-    
 </body>
 </html>
