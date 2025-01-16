@@ -1,6 +1,9 @@
 <?php
 session_start();
+
+
 $username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
 ?>
 
 <!DOCTYPE html>
@@ -30,13 +33,13 @@ $username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
             </li>
         </ul>
         <div class="menu-icon">
-            <a href="Login/login.php"> <?php echo $username; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
+            <a href="Login/login.php"> <?php echo htmlspecialchars($username) . " (" . htmlspecialchars($role) . ")"; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
         </div>
     </nav>
     <div class="background-container">
         <img src="image/background.png" alt="Background Image" class="background-image">
         <div class="text-container">
-            <h1>Welcome <?php echo $username; ?> to X-Kantin</h1>
+        <h1>Welcome <?php echo htmlspecialchars($username) . " (" . htmlspecialchars($role) . ")"; ?> to X-Kantin</h1>
             <p>
                 Kami menyajikan berbagai pilihan makanan dan minuman segar dengan harga terjangkau. 
                 Nikmati suasana nyaman dan menu yang bervariasi, cocok untuk makan bersama teman 
