@@ -1,39 +1,167 @@
 <?php
+session_start();
 include('include/config.php');
+include('include/OOPmakanan.php');
+include('include/OOPminuman.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $user_id = $_POST['user_id'];
-    $menu_id = $_POST['menu_id'];
-    $quantity = $_POST['quantity']; 
-    $type = $_POST['type']; 
+$makanan = new Makanan();
+$datamakanan = $makanan->getMakanan();
 
-    $query_menu = $type === "makanan" 
-        ? "SELECT harga FROM makanan WHERE id = ?" 
-        : "SELECT harga FROM minuman WHERE id = ?";
+$minuman = new Minuman();
+$dataminuman = $minuman->getMinuman();
 
-    $stmt_menu = $conn->prepare($query_menu);
-    $stmt_menu->bind_param("i", $menu_id);
-    $stmt_menu->execute();
-    $result = $stmt_menu->get_result();
-    $menu = $result->fetch_assoc();
+$query_makanan = "SELECT * FROM makanan";
+$result_makanan = $conn->query($query_makanan); 
+$num_rows_makanan = $result_makanan->num_rows;
 
-    if ($menu) {
-        $harga = $menu['harga'];
-        $total_harga = $harga * $quantity;
+$query_minuman = "SELECT * FROM minuman";
+$result_minuman = $conn->query($query_minuman);
+$num_rows_minuman = $result_minuman->num_rows;
 
-        $query_insert = "INSERT INTO pemesanan (user_id, menu_id, total_harga, type) VALUES (?, ?, ?, ?)";
-        $stmt_insert = $conn->prepare($query_insert);
-        $stmt_insert->bind_param("iiis", $user_id, $menu_id, $total_harga, $type);
+if (isset($_GET['id_makanan'])) {
+    // Pemesanan makanan
+    $makanan_id = $_GET['id_makanan'];
+    $quantity = $_POST['quantity'];
+    
+    // Ambil informasi makanan dari database
+    $query = "SELECT * FROM makanan WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $makanan_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $makanan = $result->fetch_assoc();
 
-        if ($stmt_insert->execute()) {
-            echo "Pemesanan berhasil dilakukan!";
+    if ($makanan) {
+        // Hitung total harga
+        $total_harga = $makanan['harga'] * $quantity;
+        
+        // Simpan pemesanan ke database
+        $user_id = $_SESSION['user_id']; // Ambil user_id dari session
+        
+        $query_pemesanan = "INSERT INTO pemesanan (user, makanan_id, quantity, total_harga, status) 
+                            VALUES (?, ?, ?, ?, 'pending')";
+        $stmt_pemesanan = $conn->prepare($query_pemesanan);
+        $stmt_pemesanan->bind_param("iiid", $user_id, $makanan_id, $quantity, $total_harga);
+        if ($stmt_pemesanan->execute()) {
+            echo "Pemesanan berhasil!";
         } else {
-            echo "Gagal melakukan pemesanan. Silakan coba lagi.";
+            echo "Pemesanan gagal!";
         }
-    } else {
-        echo "Menu tidak ditemukan.";
     }
-} else {
-    echo "Akses tidak valid.";
+} elseif (isset($_GET['id_minuman'])) {
+    // Pemesanan minuman (mirip dengan pemesanan makanan)
+    $minuman_id = $_GET['id_minuman'];
+    $quantity = $_POST['quantity'];
+    
+    // Ambil informasi minuman dari database
+    $query = "SELECT * FROM minuman WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $minuman_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $minuman = $result->fetch_assoc();
+
+    if ($minuman) {
+        // Hitung total harga
+        $total_harga = $minuman['harga'] * $quantity;
+        
+        // Simpan pemesanan ke database
+        $user_id = $_SESSION['user_id']; // Ambil user_id dari session
+        
+        $query_pemesanan = "INSERT INTO pemesanan (user_id, minuman_id, quantity, total_harga, status) 
+                            VALUES (?, ?, ?, ?, 'pending')";
+        $stmt_pemesanan = $conn->prepare($query_pemesanan);
+        $stmt_pemesanan->bind_param("iiid", $user_id, $minuman_id, $quantity, $total_harga);
+        if ($stmt_pemesanan->execute()) {
+            echo "Pemesanan berhasil!";
+        } else {
+            echo "Pemesanan gagal!";
+        }
+    }
 }
+$username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu X-Kantin</title>
+    <link rel="stylesheet" href="style/menu.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="image/Logo.png" type="image/x-icon">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo"><img src="image/Logo.png" alt=""></div>
+    <ul class="nav-links">
+        <li><a href="index.php">Home</a></li>
+        <li class="dropdown">
+            <a href="" class="dropbtn">Menu <i class="fa-solid fa-caret-down"></i></a>
+            <div class="dropdown-content">
+            <a href="menu.php#makanan">Makanan <i class="fa-solid fa-burger"></i></a>
+            <a href="menu.php#makanan">Makanan <i class="fa-solid fa-burger"></i></a>
+            </div>  
+        </li>
+     </ul>
+    <div class="menu-icon">
+    <a href="Login/login.php"> <?php echo htmlspecialchars($username); ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
+    </div>
+</nav>
+
+<section id="list">
+    <h1 class="section-title">Makanan <i class="fa-solid fa-burger"></i></h1>
+    <div class="list-container" id="makanan">
+        <?php
+        while ($row_makanan = $result_makanan->fetch_assoc()) {
+            // Assuming 'role' is stored in session
+            $is_admin = $_SESSION['role'] == 'admin'; // Check if the user is admin
+        ?>
+            <div class="list-card">
+                <h2 class="nama_makanan"><?php echo $row_makanan['nama_makanan']; ?></h2>
+                <p class="description"><?php echo $row_makanan['deskripsi']; ?></p>
+                <p class="price">Rp <?= number_format($row_makanan['harga'], 0, ',', '.'); ?></p>
+                <div class="list-actions">
+                    <?php if ($is_admin) { ?>
+                        <!-- Admin can delete, update and buy -->
+                        <a href="CUD/delete_makanan.php?id=<?php echo $row_makanan['id']; ?>" class="delete-btn">Delete</a>
+                        <a href="CUD/update_makanan.php?id=<?php echo $row_makanan['id']; ?>" class="update-btn">Update</a>
+                        <a href="CUD/tambah_makanan.php" class="add-btn">Add Menu</a>
+                    <?php } ?>
+                    <!-- Both Admin and Pelanggan can buy -->
+                    <a href="order.php?nama_makanan=<?php echo $row_makanan['nama_makanan']; ?>" class="buy-btn">Buy Now</a>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+
+    <h1 class="section-title">Minuman <i class="fa-solid fa-wine-glass"></i></h1>
+    <div class="list-container" id="minuman">
+        <?php
+        while ($row_minuman = $result_minuman->fetch_assoc()) {
+            // Same logic to check for admin role
+            $is_admin = $_SESSION['role'] == 'admin';
+        ?>
+            <div class="list-card">
+                <h2><?php echo $row_minuman['nama_minuman']; ?></h2>
+                <p class="description"><?php echo $row_minuman['deskripsi']; ?></p>
+                <p class="price">Rp <?= number_format($row_minuman['harga'], 0, ',', '.'); ?></p>
+                <div class="list-actions">
+                    <?php if ($is_admin) { ?>
+                        <!-- Admin can delete, update and buy -->
+                        <a href="CUD/delete_minuman.php?id=<?php echo $row_minuman['id']; ?>" class="delete-btn">Delete</a>
+                        <a href="CUD/update_minuman.php?id=<?php echo $row_minuman['id']; ?>" class="update-btn">Update</a>
+                        <a href="CUD/tambah_minuman.php" class="add-btn">Add Menu</a>
+                    <?php } ?>
+                    <!-- Both Admin and Pelanggan can buy -->
+                    <a href="order.php?nama_minuman=<?php echo $row_minuman['nama_minuman']; ?>" class="buy-btn">Buy Now</a>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+</section>
+<?php $conn->close(); ?>
+</body>
+</html>
