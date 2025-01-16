@@ -54,7 +54,6 @@ $num_rows_minuman = $result_minuman->num_rows;
     </div>
 </nav>
 
-
 <section id="list">
         <h1 class="section-title">Makanan <i class="fa-solid fa-burger"></i></h1>
         <div class="list-container" id="makanan">
