@@ -79,6 +79,7 @@ if (isset($_GET['id_makanan'])) {
         }
     }
 }
+$username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
 ?>
 
 <!DOCTYPE html>
@@ -104,58 +105,63 @@ if (isset($_GET['id_makanan'])) {
             <a href="menu.php#makanan">Makanan <i class="fa-solid fa-burger"></i></a>
             </div>  
         </li>
-        <li class="dropdown">
-            <a href="" class="dropbtn">Tambahkan <i class="fa-solid fa-caret-down"></i></a>
-            <div class="dropdown-content">
-            <a href="CUD/tambah_makanan.php">Makanan +</a>
-            <a href="CUD/tambah_minuman.php">Minuman +</a>
-            </div>  
-        </li>
      </ul>
     <div class="menu-icon">
-    <a href="Login/login.php"> <?php echo isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest'; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
+    <a href="Login/login.php"> <?php echo htmlspecialchars($username); ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
     </div>
 </nav>
 
 <section id="list">
-        <h1 class="section-title">Makanan <i class="fa-solid fa-burger"></i></h1>
-        <div class="list-container" id="makanan">
-            <?php
-            while ($row_makanan = $result_makanan->fetch_assoc()) {
-            ?>
-                <div class="list-card">
-                    <h2 class="nama_makanan"><?php echo $row_makanan['nama_makanan']; ?></h2>
-                    <p class="description"><?php echo $row_makanan['deskripsi']; ?></p>
-                    <p class="price">Rp <?= number_format($row_makanan['harga'], 0, ',', '.'); ?></p>
-                    <div class="list-actions">
-                    <?php if ($_SESSION['role'] == 'admin') { ?>
+    <h1 class="section-title">Makanan <i class="fa-solid fa-burger"></i></h1>
+    <div class="list-container" id="makanan">
+        <?php
+        while ($row_makanan = $result_makanan->fetch_assoc()) {
+            // Assuming 'role' is stored in session
+            $is_admin = $_SESSION['role'] == 'admin'; // Check if the user is admin
+        ?>
+            <div class="list-card">
+                <h2 class="nama_makanan"><?php echo $row_makanan['nama_makanan']; ?></h2>
+                <p class="description"><?php echo $row_makanan['deskripsi']; ?></p>
+                <p class="price">Rp <?= number_format($row_makanan['harga'], 0, ',', '.'); ?></p>
+                <div class="list-actions">
+                    <?php if ($is_admin) { ?>
+                        <!-- Admin can delete, update and buy -->
                         <a href="CUD/delete_makanan.php?id=<?php echo $row_makanan['id']; ?>" class="delete-btn">Delete</a>
                         <a href="CUD/update_makanan.php?id=<?php echo $row_makanan['id']; ?>" class="update-btn">Update</a>
-                    <?php } elseif ($_SESSION['role'] == 'pelanggan') { ?>
-                        <a href="order.php" class="buy-btn">Buy Now</a>
+                        <a href="CUD/tambah_makanan.php" class="add-btn">Add Menu</a>
                     <?php } ?>
+                    <!-- Both Admin and Pelanggan can buy -->
+                    <a href="order.php?nama_makanan=<?php echo $row_makanan['nama_makanan']; ?>" class="buy-btn">Buy Now</a>
                 </div>
-                </div>
-            <?php } ?>
-        </div>
-        <h1 class="section-title">Minuman <i class="fa-solid fa-wine-glass"></i></h1>
-        <div class="list-container" id="minuman">
-            <?php
-            while ($row_minuman = $result_minuman->fetch_assoc()) {
-            ?>
-                <div class="list-card">
-                    <h2><?php echo $row_minuman['nama_minuman']; ?></h2>
-                    <p class="description"><?php echo $row_minuman['deskripsi']; ?></p>
+            </div>
+        <?php } ?>
+    </div>
+
+    <h1 class="section-title">Minuman <i class="fa-solid fa-wine-glass"></i></h1>
+    <div class="list-container" id="minuman">
+        <?php
+        while ($row_minuman = $result_minuman->fetch_assoc()) {
+            // Same logic to check for admin role
+            $is_admin = $_SESSION['role'] == 'admin';
+        ?>
+            <div class="list-card">
+                <h2><?php echo $row_minuman['nama_minuman']; ?></h2>
+                <p class="description"><?php echo $row_minuman['deskripsi']; ?></p>
                 <p class="price">Rp <?= number_format($row_minuman['harga'], 0, ',', '.'); ?></p>
-                    <div class="list-actions">
+                <div class="list-actions">
+                    <?php if ($is_admin) { ?>
+                        <!-- Admin can delete, update and buy -->
                         <a href="CUD/delete_minuman.php?id=<?php echo $row_minuman['id']; ?>" class="delete-btn">Delete</a>
                         <a href="CUD/update_minuman.php?id=<?php echo $row_minuman['id']; ?>" class="update-btn">Update</a>
-                        <a href="order.php" class="buy-btn">Buy Now</a>
-                    </div>
+                        <a href="CUD/tambah_minuman.php" class="add-btn">Add Menu</a>
+                    <?php } ?>
+                    <!-- Both Admin and Pelanggan can buy -->
+                    <a href="order.php?nama_minuman=<?php echo $row_minuman['nama_minuman']; ?>" class="buy-btn">Buy Now</a>
                 </div>
-            <?php } ?>
-        </div>
-    </section>
-    <?php $conn->close(); ?>
+            </div>
+        <?php } ?>
+    </div>
+</section>
+<?php $conn->close(); ?>
 </body>
 </html>
