@@ -118,7 +118,7 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
         <?php
         while ($row_makanan = $result_makanan->fetch_assoc()) {
             // Assuming 'role' is stored in session
-            $is_admin = $_SESSION['role'] == 'admin'; // Check if the user is admin
+            $is_admin = $_SESSION['role'] == 'Admin'; // Check if the user is admin
         ?>
             <div class="list-card">
                 <h2 class="nama_makanan"><?php echo $row_makanan['nama_makanan']; ?></h2>
