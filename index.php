@@ -33,7 +33,7 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
             </li>
         </ul>
         <div class="menu-icon">
-            <a href="Login/login.php"> <?php echo htmlspecialchars($username) . " (" . htmlspecialchars($role) . ")"; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
+            <a href="Login/login.php"> <?php echo htmlspecialchars($username) ; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
         </div>
     </nav>
     <div class="background-container">
