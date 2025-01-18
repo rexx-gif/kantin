@@ -64,20 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quantity'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu</title>
+    <link rel="stylesheet" href="style/form.css">
 </head>
 <body>
-    <h1>Menu</h1>
+        <form method="POST">
+        <h1>Hasil Pesanan</h1>
     <p>Nama Pelanggan: <?php echo htmlspecialchars($nama_pelanggan); ?></p>
     <?php if ($item): ?>
         <p>Item: <?php echo htmlspecialchars($item['nama_makanan'] ?? $item['nama_minuman']); ?></p>
         <p>Harga: Rp <?php echo number_format($item['harga'], 0, ',', '.'); ?></p>
-        <form method="POST">
-            <label for="quantity">Quantity:</label>
+            <label for="quantity">Total:</label>
             <input type="number" id="quantity" name="quantity" min="1" required>
             <button type="submit">Pesan</button>
-        </form>
     <?php else: ?>
         <p>Item tidak ditemukan.</p>
     <?php endif; ?>
+    </form>
 </body>
 </html>
