@@ -133,8 +133,8 @@ body {
     background-color: rgba(18, 18, 18, 0.85); 
     border: 2px solid #a160ff;
     border-radius: 10px;
-    padding: 20px;
-    width: 280px;
+    padding: 28px;
+    width: 480px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s, filter 0.3s, opacity 0.3s;
@@ -222,6 +222,14 @@ body {
 
 .update-btn {
     background-color: #a160ff;
+}
+
+.add-btn {
+    background-color: #a160ff;
+}
+
+.add-btn:hover{
+    background-color: #8242cc;
 }
 
 .update-btn:hover {
