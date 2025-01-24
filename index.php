@@ -1,9 +1,10 @@
 <?php
 session_start();
 
-
 $username = isset($_SESSION['user']) ? $_SESSION['user'] : 'Guest';
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
+
+echo "<script> alert('Selamat datang, " . htmlspecialchars($username) . " di X-Kantin !') </script>";
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +24,7 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
             <img src="image/Logo.png" alt="Logo Kantin">
         </div>
         <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.php">Home</a></li>
             <li class="dropdown">
                 <a href="menu.php" class="dropbtn">Menu <i class="fas fa-caret-down"></i></a>
                 <div class="dropdown-content">
@@ -33,21 +34,24 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
             </li>
         </ul>
         <div class="menu-icon">
-            <a href="Login/login.php"> <?php echo htmlspecialchars($username) ; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
+            <a href="Login/login.php"> <?php echo htmlspecialchars($username) . " (" . htmlspecialchars($role) . ")"; ?> <i class="fa-solid fa-circle-user" style="color: #ffffff;"></i></a>
         </div>
     </nav>
     <div class="background-container">
         <img src="image/background.png" alt="Background Image" class="background-image">
         <div class="text-container">
-        <h1>Welcome <?php echo htmlspecialchars($username) . " (" . htmlspecialchars($role) . ")"; ?> to X-Kantin</h1>
+            <h1> Hi <?php echo htmlspecialchars($username); ?></h1>
+            <h1>Welcome to X-Kantin</h1>
             <p>
                 Kami menyajikan berbagai pilihan makanan dan minuman segar dengan harga terjangkau. 
                 Nikmati suasana nyaman dan menu yang bervariasi, cocok untuk makan bersama teman 
                 atau sekadar bersantai.
             </p>
         </div>
-    </div>
+        
     <script>
+
+        // Untuk transisi lapisan hitam saat link diklik
         document.addEventListener("DOMContentLoaded", () => {
             const transitionLayer = document.createElement("div");
             transitionLayer.style.position = "fixed";
