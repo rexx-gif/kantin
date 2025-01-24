@@ -1,0 +1,152 @@
+body {
+    background: black;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    color: #fff;
+}
+
+form {
+    background: rgb(20, 20, 20);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    border: 1px solid #a160ff;
+    animation: rotate-border 3s linear infinite;
+    padding: 2rem 2rem;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    color: #fff;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+form label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: #e0e0e0;
+}
+
+form input {
+    width: calc(100% - 2px);
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #a160ff;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    background: rgba(12, 12, 12, 0.2);
+    color: #fff;
+    box-sizing: border-box;
+}
+
+form input:focus {
+    animation: rotate-border 3s linear infinite;
+}
+
+form input::placeholder {
+    color: #b0b0b0;
+    transition: transform 1s ease, opacity 0.5s ease;
+}
+
+form input:focus::placeholder {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+form button {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    background: #a160ff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+form button:hover {
+    background: rgb(59, 45, 122);
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Latar belakang transparan */
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Kotak dialog */
+.alert-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 300px;
+    width: 90%;
+    font-family: Arial, sans-serif;
+}
+
+/* Pesan teks */
+.alert-message {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Tombol */
+.alert-button {
+    background: #6200ea;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.alert-button:hover {
+    background: #3700b3;
+}
+
+@keyframes rotate-border {
+    0% {
+        border-color: #b398d8;
+    }
+    25% {
+        border-color: #a160ff; 
+    }
+    50% {
+        border-color: #ffffff; 
+    }
+    75% {
+        border-color: #a160ff;
+    }
+    100% {
+        border-color: #b398d8;
+    }
+}
